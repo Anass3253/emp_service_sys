@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 class EmployeeInfoProvider extends StateNotifier<AsyncValue<Employee>> {
   EmployeeInfoProvider() : super(const AsyncValue.loading());
   final baseUri = 'https://knowledgebi.odoo.com/';
+  // final baseUri = 'https://knowledgebi-staging-22637664.dev.odoo.com/';
 
   Future<void> idChecker(String id, String token, String? mobileId) async {
     final infoUri = "${baseUri}knowledgebi-staging/api/employees";

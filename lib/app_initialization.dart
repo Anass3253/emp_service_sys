@@ -1,3 +1,4 @@
+import 'package:employee_service_system/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:employee_service_system/presentation/employee/home/home_screen.dart';
 import 'package:employee_service_system/presentation/employee/profile/my_profile.dart';
@@ -31,10 +32,10 @@ class _AppInitializationState extends State<AppInitialization> {
     //   icons: [Icons.home_outlined, Icons.person_outline],
     //   labels: ["Home", "Profile"],
     // );
-    return const MyAppBottomNavigationBar(
-      screens: [HomeScreen(), MyProfile()],
-      icons: [Icons.home_outlined, Icons.person_outline],
-      labels: ["Home", "Profile"],
+    return  MyAppBottomNavigationBar(
+      screens: const [HomeScreen(), MyProfile()],
+      icons: const [Icons.home_outlined, Icons.person_outline],
+      labels: [S.of(context).home, S.of(context).profile],
     );
   }
 }

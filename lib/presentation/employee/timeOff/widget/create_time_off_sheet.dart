@@ -1,7 +1,9 @@
 import 'package:employee_service_system/app/models/empInfoModels/time_off.dart';
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/employee_info_provider.dart';
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/time_offs_provider.dart';
+import 'package:employee_service_system/app/providers/startDataProviders/timeoff_types_provider.dart';
 import 'package:employee_service_system/app/services/pref_service.dart';
+import 'package:employee_service_system/generated/l10n.dart';
 import 'package:employee_service_system/presentation/resources/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,7 +19,7 @@ class CreateTimeOffSheet extends ConsumerStatefulWidget {
 
 class _CreateTimeOffSheetState extends ConsumerState<CreateTimeOffSheet> {
   final _formKey = GlobalKey<FormState>();
-  TimeOffTypes _type = TimeOffTypes.clientVisit;
+  Types? _selectedType;
   DateTime? _from;
   DateTime? _to;
   final TextEditingController _descCtrl = TextEditingController();
@@ -30,7 +32,9 @@ class _CreateTimeOffSheetState extends ConsumerState<CreateTimeOffSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final localLang = S.of(context);
     final df = DateFormat('MMM dd, yyyy');
+    final types = ref.watch(timeoffTypesProvider);
     return DraggableScrollableSheet(
       expand: true,
       initialChildSize: 0.95,
@@ -55,7 +59,7 @@ class _CreateTimeOffSheetState extends ConsumerState<CreateTimeOffSheet> {
                     children: [
                       Expanded(
                         child: Text(
-                          'New Time Off Request',
+                          localLang.newTimeOffReq,
                           style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
@@ -63,18 +67,23 @@ class _CreateTimeOffSheetState extends ConsumerState<CreateTimeOffSheet> {
                     ],
                   ),
                   SizedBox(height: 8.h),
-                  DropdownButtonFormField<TimeOffTypes>(
-                    initialValue: _type,
-                    decoration: const InputDecoration(labelText: 'Type'),
-                    items: TimeOffTypes.values
+                  DropdownButtonFormField<Types>(
+                    initialValue: _selectedType,
+                    decoration: InputDecoration(labelText: localLang.type),
+                    items: types
                         .map(
-                          (t) => DropdownMenuItem(
+                          (t) => DropdownMenuItem<Types>(
                             value: t,
-                            child: Text(_typeLabel(t)),
+                            child: Text(
+                              t.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         )
                         .toList(),
-                    onChanged: (v) => setState(() => _type = v ?? _type),
+                    onChanged: (v) =>
+                        setState(() => _selectedType = v ?? _selectedType),
                   ),
                   SizedBox(height: 30.h),
                   Row(
@@ -91,11 +100,13 @@ class _CreateTimeOffSheetState extends ConsumerState<CreateTimeOffSheet> {
                             if (picked != null) setState(() => _from = picked);
                           },
                           child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'From',
+                            decoration: InputDecoration(
+                              labelText: localLang.from,
                             ),
                             child: Text(
-                              _from == null ? 'Select date' : df.format(_from!),
+                              _from == null
+                                  ? localLang.selectDate
+                                  : df.format(_from!),
                             ),
                           ),
                         ),
@@ -113,9 +124,13 @@ class _CreateTimeOffSheetState extends ConsumerState<CreateTimeOffSheet> {
                             if (picked != null) setState(() => _to = picked);
                           },
                           child: InputDecorator(
-                            decoration: const InputDecoration(labelText: 'To'),
+                            decoration: InputDecoration(
+                              labelText: localLang.to,
+                            ),
                             child: Text(
-                              _to == null ? 'Select date' : df.format(_to!),
+                              _to == null
+                                  ? localLang.selectDate
+                                  : df.format(_to!),
                             ),
                           ),
                         ),
@@ -139,7 +154,7 @@ class _CreateTimeOffSheetState extends ConsumerState<CreateTimeOffSheet> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20.r),
                       ),
-                      labelText: 'Description',
+                      labelText: localLang.enterDescription,
                       alignLabelWithHint: true,
                     ),
                     minLines: 1,
@@ -151,9 +166,14 @@ class _CreateTimeOffSheetState extends ConsumerState<CreateTimeOffSheet> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.send),
+                        const Icon(Icons.send, color: Colors.white),
                         SizedBox(width: 10.w),
-                        const Text('Submit'),
+                        Text(
+                          localLang.submit,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium!.copyWith(color: Colors.white),
+                        ),
                       ],
                     ),
                   ),
@@ -173,9 +193,8 @@ class _CreateTimeOffSheetState extends ConsumerState<CreateTimeOffSheet> {
       );
       return;
     }
-
     final newItem = TimeOff(
-      type: _type,
+      type: _selectedType!.name,
       dateFrom: _from!,
       dateTo: _to!,
       description: _descCtrl.text.trim(),
@@ -209,17 +228,4 @@ class _CreateTimeOffSheetState extends ConsumerState<CreateTimeOffSheet> {
       }
     }
   }
-}
-
-String _typeLabel(dynamic type) {
-  final String t = type.toString();
-  return t
-      .replaceAll('TimeOffTypes.', '')
-      .replaceAllMapped(RegExp(r'([A-Z])'), (m) => ' ${m.group(1)}')
-      .replaceAll('_', ' ')
-      .trim()
-      .splitMapJoin(
-        ' ',
-        onNonMatch: (s) => s.isEmpty ? '' : s[0].toUpperCase() + s.substring(1),
-      );
 }

@@ -10,7 +10,7 @@ class AdminAuthProvider extends StateNotifier<AsyncValue<Admin>> {
     const url =
         "https://knowledgebi.odoo.com/knowledgebi-staging/api/login";
     // const url =
-    //     "https://knowledgebi-staging-22637664.dev.odoo.com/knowledgebi-staging/api/login";
+        // "https://knowledgebi-staging-22637664.dev.odoo.com/knowledgebi-staging/api/login";
     try {
       final response = await http.post(
         headers: {'Content-Type': 'application/json'},

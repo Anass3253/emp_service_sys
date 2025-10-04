@@ -1,5 +1,6 @@
 import 'package:employee_service_system/app/providers/adminProviders/admin_auth_provider.dart';
 import 'package:employee_service_system/app/services/pref_service.dart';
+import 'package:employee_service_system/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -47,7 +48,7 @@ class _SigninFormState extends ConsumerState<SigninForm> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(errorMsg),
-                duration: const Duration(seconds: 10),
+                duration: const Duration(seconds: 5),
               ),
             );
           }
@@ -60,7 +61,7 @@ class _SigninFormState extends ConsumerState<SigninForm> {
     }
 
     return Container(
-      height: 580.h,
+      height: 600.h,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         shape: BoxShape.rectangle,
@@ -79,20 +80,20 @@ class _SigninFormState extends ConsumerState<SigninForm> {
               SizedBox(height: 20.h),
               ApptextField(
                 controller: emailController,
-                label: 'Enter your email',
+                label: S.of(context).enterYourEmail,
                 keyboardType: TextInputType.emailAddress,
                 prefix: const Icon(Icons.email_outlined),
                 isObscureText: false,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Email is required';
+                    return S.of(context).emailRequired;
                   }
                   // simple email regex
                   final emailRegex = RegExp(
                     r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                   );
                   if (!emailRegex.hasMatch(value.trim())) {
-                    return 'Enter a valid email';
+                    return S.of(context).invalidEmail;
                   }
                   return null;
                 },
@@ -100,7 +101,7 @@ class _SigninFormState extends ConsumerState<SigninForm> {
               SizedBox(height: 30.h),
               ApptextField(
                 controller: passwordController,
-                label: 'Password',
+                label: S.of(context).enterYourPassword,
                 prefix: const Icon(Icons.lock_outline),
                 isObscureText: true,
                 obscureText: _isVisible,
@@ -111,17 +112,17 @@ class _SigninFormState extends ConsumerState<SigninForm> {
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Password is required';
+                    return S.of(context).passwordRequired;
                   }
-                  if (value.length < 6) {
-                    return 'Password must be at least 6 characters';
-                  }
-                  if (!RegExp(r'[A-Z]').hasMatch(value)) {
-                    return 'Password must contain at least one uppercase letter';
-                  }
-                  if (!RegExp(r'[0-9]').hasMatch(value)) {
-                    return 'Password must contain at least one number';
-                  }
+                  // if (value.length < 6) {
+                  //   return 'Password must be at least 6 characters';
+                  // }
+                  // if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                  //   return 'Password must contain at least one uppercase letter';
+                  // }
+                  // if (!RegExp(r'[0-9]').hasMatch(value)) {
+                  //   return 'Password must contain at least one number';
+                  // }
                   return null;
                 },
               ),
@@ -135,10 +136,12 @@ class _SigninFormState extends ConsumerState<SigninForm> {
                         onSignin(emailController, passwordController);
                       },
                 child: _isLoading
-                    ? const CircularProgressIndicator()
+                    ? const CircularProgressIndicator(color: Colors.white)
                     : Text(
-                        'Sign In',
-                        style: Theme.of(context).textTheme.bodyLarge,
+                        S.of(context).signIn,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyLarge!.copyWith(color: Colors.white),
                       ),
               ),
             ],

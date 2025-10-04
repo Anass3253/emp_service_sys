@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 class AttendanceProvider extends StateNotifier<AsyncValue<List<Attendance>>> {
   AttendanceProvider() : super(const AsyncLoading());
   final baseUri = 'https://knowledgebi.odoo.com/';
+  // final baseUri = 'https://knowledgebi-staging-22637664.dev.odoo.com/';
 
   Future<void> getAttendance(String token, Employee currentEmp) async {
     final attendanceUri =

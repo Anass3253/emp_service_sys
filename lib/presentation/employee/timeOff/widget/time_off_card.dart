@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:employee_service_system/generated/l10n.dart';
 
 class TimeOffCard extends StatelessWidget {
   const TimeOffCard({super.key, required this.timeOff});
@@ -11,7 +12,8 @@ class TimeOffCard extends StatelessWidget {
     final df = DateFormat('MMM dd, yyyy');
     final Color stateColor = _stateColor(timeOff.state);
     final IconData icon = _typeIcon(timeOff.type);
-    final String typeLabel = _typeLabel(timeOff.type);
+    final String typeLabel = timeOff.type;
+    final String stateLabel = _localizedState(context, timeOff.state);
 
     return Card(
       color: Theme.of(context).cardColor,
@@ -55,7 +57,7 @@ class TimeOffCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(9999),
                         ),
                         child: Text(
-                          timeOff.state.toString().toUpperCase(),
+                          stateLabel,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 color: stateColor,
@@ -125,29 +127,87 @@ Color _stateColor(String state) {
 }
 
 IconData _typeIcon(dynamic type) {
-  final String t = type.toString();
-  if (t.contains('annual') || t.contains('forward')) return Icons.beach_access;
-  if (t.contains('sick')) return Icons.healing;
-  if (t.contains('emergency')) return Icons.warning_amber_rounded;
-  if (t.contains('unpaid')) return Icons.money_off;
-  if (t.contains('client') || t.contains('visit')) return Icons.handshake;
-  if (t.contains('wedding') || t.contains('haj') || t.contains('omra')) {
+  final String t = type.toString().toLowerCase();
+  
+  // Regular/Annual leave
+  if (t.contains('regular') || t.contains('اعتيادي') || t.contains('annual')) {
+    return Icons.beach_access;
+  }
+  
+  // Overtime
+  if (t.contains('overtime') || t.contains('اضافي') || t.contains('extra')) {
+    return Icons.timer;
+  }
+  
+  // Emergency
+  if (t.contains('emergency') || t.contains('عارضة') || t.contains('emergncy')) {
+    return Icons.warning_amber_rounded;
+  }
+  
+  // Permission
+  if (t.contains('permission') || t.contains('اذن') || t.contains('premission')) {
+    return Icons.assignment_turned_in;
+  }
+  
+  // Visit
+  if (t.contains('visit') || t.contains('زيارة')) {
+    return Icons.handshake;
+  }
+  
+  // Work From Home
+  if (t.contains('work from home') || t.contains('home')) {
+    return Icons.home_work;
+  }
+  
+  // Unpaid
+  if (t.contains('unpaid') || t.contains('بالخصم')) {
+    return Icons.money_off;
+  }
+  
+  // Wedding Leave
+  if (t.contains('wedding')) {
     return Icons.celebration;
   }
-  if (t.contains('military')) return Icons.shield;
-  if (t.contains('extra') || t.contains('compens')) return Icons.timer;
+  
+  // Haj & Omra Leave
+  if (t.contains('haj') || t.contains('omra') || t.contains('حج') || t.contains('عمرة')) {
+    return Icons.mosque;
+  }
+  
+  // Military Service Leave
+  if (t.contains('military') || t.contains('عسكري')) {
+    return Icons.shield;
+  }
+  
+  // Sick Leave
+  if (t.contains('sick') || t.contains('مرضي')) {
+    return Icons.healing;
+  }
+  
+  // Compensatory
+  if (t.contains('compensatory') || t.contains('تعويض') || t.contains('compens')) {
+    return Icons.restore;
+  }
+  
+  // Default fallback
   return Icons.event;
 }
 
-String _typeLabel(dynamic type) {
-  final String t = type.toString();
-  return t
-      .replaceAll('TimeOffTypes.', '')
-      .replaceAllMapped(RegExp(r'([A-Z])'), (m) => ' ${m.group(1)}')
-      .replaceAll('_', ' ')
-      .trim()
-      .splitMapJoin(
-        ' ',
-        onNonMatch: (s) => s.isEmpty ? '' : s[0].toUpperCase() + s.substring(1),
-      );
+
+String _localizedState(BuildContext context, String rawState) {
+  final s = rawState.toLowerCase();
+  // Group states and return localized label using existing S getters.
+  if (s == 'approved' || s == 'validate' || s == 'done') {
+    return S.of(context).approved;
+  }
+  if (s == 'pending' || s == 'to approve' || s == 'draft' || s == 'confirm') {
+    return S.of(context).pending;
+  }
+  if (s == 'refused' || s == 'cancelled' || s == 'cancel') {
+    return S.of(context).refused;
+  }
+  // Fallback: return as-is with simple capitalization.
+  return rawState.isEmpty
+      ? ''
+      : rawState[0].toUpperCase() + rawState.substring(1);
 }

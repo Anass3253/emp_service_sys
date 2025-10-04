@@ -1,10 +1,12 @@
 import 'package:employee_service_system/app/models/usersModels/employee.dart';
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/employee_info_provider.dart';
+import 'package:employee_service_system/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:employee_service_system/presentation/employee/home/widgets/dashboard_card.dart';
 import 'package:employee_service_system/routing/routes.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -22,32 +24,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         // imagePath: 'assets/images/KBI_logo2.png',
-        title: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              backgroundImage: AssetImage('assets/images/KBI_logo2.png'),
-              radius: 25,
-              backgroundColor: Colors.transparent,
-            ),
-            Text('Knowledge BI'),
-          ],
+        title: Center(
+          child: Image.asset(
+            'assets/images/knowledge Bi.png',
+            height: 65.h,
+            fit: BoxFit.contain,
+          ),
         ),
       ),
-      //
-      // GradientAppbar(
-      //   actions: [
-      //     IconButton(
-      //       onPressed: () {
-      //         Navigator.pushReplacementNamed(context, Routes.adminHomeScreen);
-      //       },
-      //       icon: Icon(Icons.person_2_outlined, size: 35.sp),
-      //     ),
-      //   ],
-      //   imagePath: 'assets/images/KBI_logo2.png',
-      //   title: 'Knowledge BI',
-      //   gradient: Theme.of(context).extension<GradientTheme>()!.appBarGradient,
-      // ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: empInfoState.when(
         data: (currentEmp) => SingleChildScrollView(
@@ -65,7 +49,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Your Dashboard:',
+                      '${S.of(context).yourDashboard}:',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         fontWeight: FontWeight.bold,
                         fontSize: isShort ? 16.sp : 18.sp,
@@ -75,14 +59,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _dashboard().length,
+                      itemCount: _dashboard(context).length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: isShort ? 3 : 2,
-                        childAspectRatio: isShort ? 1.5 : 1.1,
+                        childAspectRatio: isShort ? 1.5 : 1,
                         mainAxisSpacing: isShort ? 8 : 10,
                         crossAxisSpacing: isShort ? 8 : 10,
                       ),
-                      itemBuilder: (context, index) => _dashboard()[index],
+                      itemBuilder: (context, index) =>
+                          _dashboard(context)[index],
                     ),
                   ],
                 ),
@@ -154,7 +139,7 @@ Widget _topContainer(BuildContext context, Employee currentEmp, bool isShort) {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome back, ${currentEmp.name}',
+                  '${S.of(context).welcome}, ${currentEmp.name}',
                   overflow: TextOverflow.clip,
                   softWrap: true,
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -178,26 +163,34 @@ Widget _topContainer(BuildContext context, Employee currentEmp, bool isShort) {
   );
 }
 
-List<Widget> _dashboard() {
+List<Widget> _dashboard(BuildContext context) {
   return [
-    const DashboardCard(
+    DashboardCard(
       icon: Icons.event_available_outlined,
-      title: 'Attendance',
+      title: S.of(context).attendanceTitle,
+      description: S.of(context).attendanceDescription,
+      clickToView: S.of(context).attendenceClickToView,
       route: Routes.attendanceScreen,
     ),
-    const DashboardCard(
-      icon: Icons.free_breakfast_outlined,
-      title: 'Time Off',
+    DashboardCard(
+      icon: Icons.beach_access_outlined,
+      title: S.of(context).timeOffTitle,
+      description: S.of(context).timeOffDescription,
+      clickToView: S.of(context).timeOffClickToView,
       route: Routes.timeoffScreen,
     ),
-    const DashboardCard(
-      icon: Icons.receipt_long_outlined,
-      title: 'Payslips',
+    DashboardCard(
+      icon: FontAwesomeIcons.moneyBill1,
+      title: S.of(context).payslipsTitle,
+      description: S.of(context).payslipsDescription,
+      clickToView: S.of(context).payslipsClickToView,
       route: Routes.payslipsScreen,
     ),
-    const DashboardCard(
+    DashboardCard(
       icon: Icons.account_balance_wallet_outlined,
-      title: 'Expenses',
+      title: S.of(context).expensesTitle,
+      description: S.of(context).expensesDescription,
+      clickToView: S.of(context).expensesClickToView,
       route: Routes.expensesScreen,
     ),
   ];

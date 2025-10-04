@@ -8,6 +8,11 @@
 		<string>We need to use your Face ID / Touch ID to verify your identity.</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>This app needs access to location when open.</string>
+		<key>CFBundleLocalizations</key>
+		<array>
+			<string>en</string>
+			<string>ar</string>
+		</array>
 		<key>CFBundleDisplayName</key>
 		<string>Knowledge Bi Hr</string>
 		<key>CFBundleExecutable</key>

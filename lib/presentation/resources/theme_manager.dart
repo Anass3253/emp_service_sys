@@ -6,7 +6,7 @@ class ThemeManager {
   // Define your custom colors
   static const Color _darkPrimary = Color(0xFFB13F26);
   static const Color _darkSecondary = Color(0xFF006080);
-  static const  Color _darkBackground = Colors.blueGrey;
+  static const Color _darkBackground = Color(0xFF607D8B);
   static const Color _darkColorText = Colors.white;
 
   static const Color _lightPrimary = Color(0xFFED6343);
@@ -55,23 +55,23 @@ class ThemeManager {
       },
     ),
     cardColor: Colors.white,
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: _darkPrimary,
       surface: _lightBackground,
-      secondary: _lightSecondry,
+      secondary: Color(0xFF00547c),
       tertiary: _darkSecondary,
       onPrimary: _lightColorText,
       onTertiary: _darkSecondary,
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: _lightBackground,
-      foregroundColor: _secondgradient,
+      backgroundColor: Colors.white,
+      foregroundColor: Color(0xFF00547c),
       centerTitle: true,
     ),
-    fontFamily: "Inter",
+    fontFamily: "Verdana",
     textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: Colors.black, fontFamily: "Inter"),
-      bodyMedium: TextStyle(color: Colors.black, fontFamily: "Inter"),
+      bodyLarge: TextStyle(color: Colors.black),
+      bodyMedium: TextStyle(color: Colors.black),
     ),
   );
 
@@ -93,15 +93,15 @@ class ThemeManager {
     colorScheme: const ColorScheme.dark(
       primary: _lightPrimary,
       surface: _darkBackground,
-      secondary: _darkSecondary,
+      secondary: Color(0xFF00547c),
       tertiary: _secondgradient,
       onTertiary: _lightColorText,
       onPrimary: _darkColorText,
     ),
     cardColor: Colors.black87,
     appBarTheme: const AppBarTheme(
-      backgroundColor: _secondgradient,
-      foregroundColor: Colors.white,
+      backgroundColor: Colors.white,
+      foregroundColor: Color(0xFF00547c),
     ),
     fontFamily: "Poppins",
     textTheme: const TextTheme(

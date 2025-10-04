@@ -2,12 +2,14 @@ import 'package:employee_service_system/app/providers/employeeProviders/employee
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/expenses_provider.dart';
 import 'package:employee_service_system/app/providers/startDataProviders/expenses_categories_providers.dart';
 import 'package:employee_service_system/app/services/pref_service.dart';
+import 'package:employee_service_system/generated/l10n.dart';
 import 'package:employee_service_system/presentation/employee/expenses/widgets/create_expense_sheet.dart';
 import 'package:employee_service_system/presentation/employee/expenses/widgets/state_chip.dart';
 import 'package:employee_service_system/routing/route_observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 
 class ExpensesScreen extends ConsumerStatefulWidget {
   const ExpensesScreen({super.key});
@@ -66,6 +68,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen>
 
   @override
   Widget build(BuildContext context) {
+    final localLang = S.of(context);
     final expensesAsync = ref.watch(expensesProvider);
 
     Future<void> refresh() async {
@@ -81,24 +84,41 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen>
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Expenses')),
+      appBar: AppBar(title: Text(localLang.expensesTitle)),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Theme.of(context).colorScheme.secondary,
         onPressed: _openCreateSheet,
-        icon: const Icon(Icons.add),
-        label: const Text('Request Expense'),
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: Text(
+          localLang.requestExpense,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium!.copyWith(color: Colors.white),
+        ),
       ),
       body: expensesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircularProgressIndicator(),
+                      SizedBox(height: 16.h),
+                      Text(
+                        localLang.loadingExpenses,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
         error: (e, __) => Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(Icons.error_outline, color: Colors.redAccent),
               SizedBox(height: 8.h),
-              const Text('Failed to load expenses'),
+              Text(localLang.failedToLoadExpenses),
               SizedBox(height: 8.h),
-              TextButton(onPressed: refresh, child: const Text('Retry')),
+              TextButton(onPressed: refresh, child: Text(localLang.retry)),
             ],
           ),
         ),
@@ -106,15 +126,18 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen>
           if (expenses.isEmpty) {
             return RefreshIndicator(
               onRefresh: refresh,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'You currently don\'t have any Expenses!',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ],
+              child: Padding(
+                padding: EdgeInsets.only(left: 15.w),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        localLang.noExpenses,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -144,13 +167,13 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen>
                       children: [
                         SizedBox(height: 4.h),
                         Text(
-                          expense.category ?? 'Uncategorized',
+                          expense.category ?? localLang.uncategorized,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         SizedBox(height: 2.h),
                         Text(
                           _formatDate(expense.date),
-                          style: Theme.of(context).textTheme.bodySmall
+                          style: Theme.of(context).textTheme.bodyLarge
                               ?.copyWith(color: Colors.grey[600]),
                         ),
                       ],
@@ -180,11 +203,13 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen>
 }
 
 String _formatAmount(double amount, String currency) {
-  return '$currency ${amount.toStringAsFixed(2)}';
+  return 'EGB ${amount.toStringAsFixed(2)}';
 }
 
 String _formatDate(DateTime date) {
-  return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  print(date);
+  // return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  return DateFormat('yyyy-MM-dd').format(date);
 }
 
 extension on _ExpensesScreenState {

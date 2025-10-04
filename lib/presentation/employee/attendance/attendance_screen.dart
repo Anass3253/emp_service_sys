@@ -1,7 +1,9 @@
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/attendance_provider.dart';
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/employee_info_provider.dart';
+import 'package:employee_service_system/app/providers/ui_providers/language_provider.dart';
 import 'package:employee_service_system/app/services/pref_service.dart';
 import 'package:employee_service_system/app/models/empInfoModels/attendance.dart';
+import 'package:employee_service_system/generated/l10n.dart';
 import 'package:employee_service_system/presentation/resources/app_button.dart';
 import 'package:employee_service_system/routing/route_observer.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart' as provider;
 
 class AttendanceScreen extends ConsumerStatefulWidget {
   const AttendanceScreen({super.key});
@@ -19,7 +22,8 @@ class AttendanceScreen extends ConsumerStatefulWidget {
 
 class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
     with RouteAware {
-  bool isCheckedIn = false;
+  bool? isCheckedIn;
+  bool isLoading = true;
   @override
   void initState() {
     Future.microtask(() async {
@@ -33,7 +37,16 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
         }
       }
     });
+    _loadCheckinState();
     super.initState();
+  }
+
+  Future<void> _loadCheckinState() async {
+    final result = await PrefService.getCheckInState();
+    setState(() {
+      isCheckedIn = result ?? false;
+      isLoading = false;
+    });
   }
 
   @override
@@ -98,7 +111,7 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
     // Company location
     const double companyLat = 30.0801;
     const double companyLng = 31.3146;
-    const double allowedRadius = 25; // in meters
+    const double allowedRadius = 30; // in meters
 
     // Get current location
     Position position = await Geolocator.getCurrentPosition(
@@ -121,9 +134,13 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
     if (await canCheckIn()) {
       setState(() {
         isCheckedIn = true;
+        PrefService.saveCheckInState(isCheckedIn!);
       });
       final checkIn = DateTime.now();
-      final checkInFormated = DateFormat('yyyy-MM-dd HH:mm:ss').format(checkIn);
+      final checkInFormated = DateFormat(
+        'yyyy-MM-dd HH:mm:ss',
+        'en',
+      ).format(checkIn);
       PrefService.saveCheckIn(checkInFormated);
 
       if (mounted) {
@@ -132,7 +149,12 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
           builder: (context) => AlertDialog(
             actions: [
               AppButton(
-                child: const Text('OK'),
+                child: Text(
+                  S.of(context).ok,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium!.copyWith(color: Colors.white),
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -141,7 +163,7 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
             shape: ContinuousRectangleBorder(
               borderRadius: BorderRadiusGeometry.circular(15.r),
             ),
-            content: const Text('Check in successful!'),
+            content: Text(S.of(context).checkInSuccessful),
           ),
         );
       }
@@ -152,7 +174,12 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
           builder: (context) => AlertDialog(
             actions: [
               AppButton(
-                child: const Text('OK'),
+                child: Text(
+                  S.of(context).ok,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium!.copyWith(color: Colors.white),
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -161,7 +188,7 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
             shape: ContinuousRectangleBorder(
               borderRadius: BorderRadiusGeometry.circular(15.r),
             ),
-            content: const Text('Failed to Check In'),
+            content: Text(S.of(context).failedToCheckIn),
           ),
         );
       }
@@ -172,11 +199,14 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
     if (await canCheckIn()) {
       setState(() {
         isCheckedIn = false;
+        PrefService.saveCheckInState(isCheckedIn!);
       });
+
       //retreiving the check in and getting check out
       final checkOut = DateTime.now();
       final checkOutFormated = DateFormat(
         'yyyy-MM-dd HH:mm:ss',
+        'en',
       ).format(checkOut);
 
       final String? checkIn = await PrefService.getCheckIn();
@@ -203,7 +233,12 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
           builder: (context) => AlertDialog(
             actions: [
               AppButton(
-                child: const Text('OK'),
+                child: Text(
+                  S.of(context).ok,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium!.copyWith(color: Colors.white),
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -212,7 +247,7 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
             shape: ContinuousRectangleBorder(
               borderRadius: BorderRadiusGeometry.circular(15.r),
             ),
-            content: const Text('Check out successful!'),
+            content: Text(S.of(context).checkOutSuccessful),
           ),
         );
       }
@@ -223,7 +258,12 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
           builder: (context) => AlertDialog(
             actions: [
               AppButton(
-                child: const Text('OK'),
+                child: Text(
+                  S.of(context).ok,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium!.copyWith(color: Colors.white),
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -232,7 +272,7 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
             shape: ContinuousRectangleBorder(
               borderRadius: BorderRadiusGeometry.circular(15.r),
             ),
-            content: const Text('Failed to Check out'),
+            content: Text(S.of(context).failedToCheckOut),
           ),
         );
       }
@@ -241,6 +281,8 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
 
   @override
   Widget build(BuildContext context) {
+    final localLang = S.of(context);
+    final langProvider = provider.Provider.of<LanguageProvider>(context);
     final attendencesAsync = ref.watch(attendanceProvider);
     Future<void> refresh() async {
       final currentToken = await PrefService.getToken();
@@ -256,400 +298,468 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen>
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(title: const Text('Attendance'),),
-      body: Padding(
-        padding: EdgeInsets.all(10.w),
-        child: attendencesAsync.when(
-          data: (attendances) {
-            // Group by month for expandable sections and show compact rows per day
-            final groupedByMonth = _groupAttendancesByMonth(attendances);
-            final monthKeys = groupedByMonth.keys.toList();
-
-            return Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 10.h,
-                    horizontal: 10.w,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+      appBar: AppBar(title: Text(S.of(context).attendanceTitle)),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: EdgeInsets.all(10.w),
+              child: attendencesAsync.when(
+                data: (attendances) {
+                  // Group by month for expandable sections and show compact rows per day
+                  final groupedByMonth = _groupAttendancesByMonth(attendances);
+                  final monthKeys = groupedByMonth.keys.toList();
+                  final bool isDark =
+                      Theme.of(context).brightness == Brightness.dark;
+                  return Column(
                     children: [
-                      Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 10.h,
+                          horizontal: 10.w,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              isCheckedIn
-                                  ? 'Click to Check out'
-                                  : 'Click to check in',
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(color: Colors.black),
-                            ),
-                            SizedBox(height: 4.h),
-                            GestureDetector(
-                              onTap: isCheckedIn ? checkOut : checkIn,
-                              child: Container(
-                                padding: EdgeInsets.all(30.h),
-                                decoration: BoxDecoration(
-                                  color: isCheckedIn
-                                      ? Colors.red.withValues(alpha: 0.3)
-                                      : Colors.green.withValues(alpha: 0.3),
-                                  border: Border.all(
-                                    color: isCheckedIn
-                                        ? Colors.red
-                                        : Colors.green,
-                                    width: 1,
+                            Center(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    isCheckedIn!
+                                        ? localLang.clickToCheckOut
+                                        : localLang.clickToCheckIn,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(color: Colors.black),
                                   ),
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      isCheckedIn ? Icons.logout : Icons.login,
-                                      size: 30.sp,
-                                      color: isCheckedIn
-                                          ? Colors.red
-                                          : Colors.green,
-                                    ),
-                                    SizedBox(height: 10.h),
-                                    Text(
-                                      isCheckedIn ? 'Check out' : 'Check In',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge!
-                                          .copyWith(
-                                            fontWeight: FontWeight.bold,
+                                  SizedBox(height: 4.h),
+                                  GestureDetector(
+                                    onTap: isCheckedIn! ? checkOut : checkIn,
+                                    child: Container(
+                                      padding: EdgeInsets.all(30.h),
+                                      decoration: BoxDecoration(
+                                        color: isCheckedIn!
+                                            ? isDark
+                                                  ? Colors.red.withValues(
+                                                      alpha: 0.8,
+                                                    )
+                                                  : Colors.red.withValues(
+                                                      alpha: 0.3,
+                                                    )
+                                            : Colors.green.withValues(
+                                                alpha: 0.3,
+                                              ),
+                                        border: Border.all(
+                                          color: isCheckedIn!
+                                              ? Colors.red
+                                              : Colors.green,
+                                          width: 1,
+                                        ),
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.circular(
+                                          10.r,
+                                        ),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Icon(
+                                            isCheckedIn!
+                                                ? Icons.logout
+                                                : Icons.login,
+                                            size: 30.sp,
+                                            color: isCheckedIn!
+                                                ? Colors.red
+                                                : Colors.green,
                                           ),
+                                          SizedBox(height: 10.h),
+                                          Text(
+                                            isCheckedIn!
+                                                ? localLang.checkOut
+                                                : localLang.checkIn,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge!
+                                                .copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 15.h),
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: refresh,
-                    child: ListView.separated(
-                      itemCount: monthKeys.length,
-                      separatorBuilder: (_, __) => SizedBox(height: 6.h),
-                      itemBuilder: (context, monthIndex) {
-                        final monthKey = monthKeys[monthIndex];
-                        final monthItems = groupedByMonth[monthKey]!;
+                      SizedBox(height: 15.h),
+                      Expanded(
+                        child: RefreshIndicator(
+                          onRefresh: refresh,
+                          child: ListView.separated(
+                            itemCount: monthKeys.length,
+                            separatorBuilder: (_, __) => SizedBox(height: 6.h),
+                            itemBuilder: (context, monthIndex) {
+                              final monthKey = monthKeys[monthIndex];
+                              final monthItems = groupedByMonth[monthKey]!;
 
-                        final totalHours = monthItems.fold<double>(
-                          0,
-                          (sum, a) => sum + a.workedHrs!,
-                        );
+                              final totalHours = monthItems.fold<double>(
+                                0,
+                                (sum, a) => sum + a.workedHrs!,
+                              );
 
-                        return Card(
-                          elevation: 1,
-                          margin: EdgeInsets.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          child: Theme(
-                            data: Theme.of(context).copyWith(
-                              dividerColor: Colors.transparent,
-                              splashColor: Theme.of(
-                                context,
-                              ).colorScheme.primary.withValues(alpha: 0.06),
-                              highlightColor: Theme.of(
-                                context,
-                              ).colorScheme.primary.withValues(alpha: 0.04),
-                            ),
-                            child: ExpansionTile(
-                              tilePadding: EdgeInsets.symmetric(
-                                horizontal: 12.w,
-                                vertical: 2.h,
-                              ),
-                              childrenPadding: EdgeInsets.symmetric(
-                                horizontal: 8.w,
-                                vertical: 6.h,
-                              ),
-                              title: Row(
-                                children: [
-                                  Text(
-                                    monthKey,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(fontWeight: FontWeight.w700),
+                              return Card(
+                                elevation: 1,
+                                margin: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.r),
+                                ),
+                                child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                    dividerColor: Colors.transparent,
+                                    splashColor: Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withValues(alpha: 0.06),
+                                    highlightColor: Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withValues(alpha: 0.04),
                                   ),
-                                  SizedBox(width: 8.w),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8.w,
+                                  child: ExpansionTile(
+                                    tilePadding: EdgeInsets.symmetric(
+                                      horizontal: 12.w,
                                       vertical: 2.h,
                                     ),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary
-                                          .withValues(alpha: 0.08),
-                                      borderRadius: BorderRadius.circular(999),
+                                    childrenPadding: EdgeInsets.symmetric(
+                                      horizontal: 8.w,
+                                      vertical: 6.h,
                                     ),
-                                    child: Text(
-                                      '${monthItems.length} days',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Icon(
-                                    Icons.access_time,
-                                    size: 16.sp,
-                                    color: Theme.of(context).hintColor,
-                                  ),
-                                  SizedBox(width: 4.w),
-                                  Text(
-                                    '${totalHours.toStringAsFixed(1)} h',
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(
-                                          color: Theme.of(context).hintColor,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                              children: [
-                                Divider(
-                                  height: 1.h,
-                                  thickness: 0.6,
-                                  color: Theme.of(
-                                    context,
-                                  ).dividerColor.withValues(alpha: 0.5),
-                                ),
-                                ListView.separated(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: monthItems.length,
-                                  separatorBuilder: (_, __) => Divider(
-                                    height: 1.h,
-                                    thickness: 0.6,
-                                    color: Theme.of(
-                                      context,
-                                    ).dividerColor.withValues(alpha: 0.5),
-                                  ),
-                                  itemBuilder: (context, index) {
-                                    final item = monthItems[index];
-                                    final isEqual = item.workedHrs == 8;
-                                    final isGreater = item.workedHrs! > 8;
-                                    final day = item.checkIn;
-                                    final checkInStr = DateFormat(
-                                      'HH:mm',
-                                    ).format(item.checkIn);
-                                    final checkOutStr = item.checkOut == null
-                                        ? ""
-                                        : DateFormat(
-                                            'HH:mm',
-                                          ).format(item.checkOut!);
-                                    final weekdayStr = DateFormat(
-                                      'EEE, dd',
-                                    ).format(day);
-
-                                    return Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 6.w,
-                                        vertical: 6.h,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          // Day badge
-                                          Container(
-                                            width: 36.w,
-                                            height: 36.w,
-                                            alignment: Alignment.center,
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary
-                                                  .withValues(alpha: 0.12),
-                                              borderRadius:
-                                                  BorderRadius.circular(8.r),
-                                            ),
-                                            child: Text(
-                                              DateFormat('d').format(day),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleSmall
-                                                  ?.copyWith(
-                                                    color: Theme.of(
-                                                      context,
-                                                    ).colorScheme.primary,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                            ),
-                                          ),
-                                          SizedBox(width: 10.w),
-                                          // Details
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  weekdayStr,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyMedium
-                                                      ?.copyWith(
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                ),
-                                                SizedBox(height: 2.h),
-                                                Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.login,
-                                                      size: 14.sp,
-                                                      color: Colors.green,
-                                                    ),
-                                                    SizedBox(width: 4.w),
-                                                    Text(
-                                                      checkInStr,
-                                                      style: Theme.of(
-                                                        context,
-                                                      ).textTheme.bodySmall,
-                                                    ),
-                                                    SizedBox(width: 10.w),
-                                                    Icon(
-                                                      Icons.logout,
-                                                      size: 14.sp,
-                                                      color: Colors.orange,
-                                                    ),
-                                                    SizedBox(width: 4.w),
-                                                    Text(
-                                                      checkOutStr,
-                                                      style: Theme.of(
-                                                        context,
-                                                      ).textTheme.bodySmall,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          // Hours chip
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 8.w,
-                                              vertical: 4.h,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: isEqual
-                                                  ? Theme.of(context)
-                                                        .colorScheme
-                                                        .onTertiary
-                                                        .withValues(alpha: 0.1)
-                                                  : isGreater
-                                                  ? Colors.green.withValues(
-                                                      alpha: 0.1,
-                                                    )
-                                                  : Colors.red.withValues(
-                                                      alpha: 0.1,
-                                                    ),
-                                              borderRadius:
-                                                  BorderRadius.circular(999),
-                                              border: Border.all(
-                                                color: isEqual
-                                                    ? Theme.of(context)
-                                                          .colorScheme
-                                                          .onTertiary
-                                                          .withValues(
-                                                            alpha: 0.3,
-                                                          )
-                                                    : isGreater
-                                                    ? Colors.green.withValues(
-                                                        alpha: 0.3,
-                                                      )
-                                                    : Colors.red.withValues(
-                                                        alpha: 0.3,
-                                                      ),
+                                    title: Row(
+                                      children: [
+                                        Text(
+                                          monthKey,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w700,
                                               ),
+                                        ),
+                                        SizedBox(width: 8.w),
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 8.w,
+                                            vertical: 2.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                                .withValues(alpha: 0.08),
+                                            borderRadius: BorderRadius.circular(
+                                              999,
                                             ),
-                                            child: Text(
-                                              '${(item.workedHrs)!.toStringAsFixed(1)} h',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall
-                                                  ?.copyWith(
+                                          ),
+                                          child: Text(
+                                            '${langProvider.formatNumber(monthItems.length)} ${localLang.days}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.copyWith(
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 10.sp,
+                                                ),
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        Icon(
+                                          Icons.access_time,
+                                          size: 10.sp,
+                                          color: Theme.of(context).hintColor,
+                                        ),
+                                        SizedBox(width: 4.w),
+                                        Text(
+                                          '${langProvider.formatNumber(totalHours)} ${localLang.hoursAbbreviation}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                color: Theme.of(
+                                                  context,
+                                                ).hintColor,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 10.sp,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                    children: [
+                                      Divider(
+                                        height: 1.h,
+                                        thickness: 0.6,
+                                        color: Theme.of(
+                                          context,
+                                        ).dividerColor.withValues(alpha: 0.5),
+                                      ),
+                                      ListView.separated(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: monthItems.length,
+                                        separatorBuilder: (_, __) => Divider(
+                                          height: 1.h,
+                                          thickness: 0.6,
+                                          color: Theme.of(
+                                            context,
+                                          ).dividerColor.withValues(alpha: 0.5),
+                                        ),
+                                        itemBuilder: (context, index) {
+                                          final item = monthItems[index];
+                                          final isEqual = item.workedHrs == 8;
+                                          final isGreater = item.workedHrs! > 8;
+                                          final day = item.checkIn;
+                                          final checkInStr = DateFormat(
+                                            'HH:mm',
+                                          ).format(item.checkIn);
+                                          final checkOutStr =
+                                              item.checkOut == null
+                                              ? ""
+                                              : DateFormat(
+                                                  'HH:mm',
+                                                ).format(item.checkOut!);
+                                          final weekdayStr = DateFormat(
+                                            'EEE, dd',
+                                          ).format(day);
+
+                                          return Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 6.w,
+                                              vertical: 6.h,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                // Day badge
+                                                Container(
+                                                  width: 36.w,
+                                                  height: 36.w,
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .primary
+                                                        .withValues(
+                                                          alpha: 0.12,
+                                                        ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8.r,
+                                                        ),
+                                                  ),
+                                                  child: Text(
+                                                    DateFormat('d').format(day),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleSmall
+                                                        ?.copyWith(
+                                                          color: Theme.of(
+                                                            context,
+                                                          ).colorScheme.primary,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                        ),
+                                                  ),
+                                                ),
+                                                SizedBox(width: 10.w),
+                                                // Details
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        weekdayStr,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyMedium
+                                                            ?.copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                      ),
+                                                      SizedBox(height: 2.h),
+                                                      Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.login,
+                                                            size: 14.sp,
+                                                            color: Colors.green,
+                                                          ),
+                                                          SizedBox(width: 4.w),
+                                                          Text(
+                                                            checkInStr,
+                                                            style:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .textTheme
+                                                                    .bodySmall,
+                                                          ),
+                                                          SizedBox(width: 10.w),
+                                                          Icon(
+                                                            Icons.logout,
+                                                            size: 14.sp,
+                                                            color:
+                                                                Colors.orange,
+                                                          ),
+                                                          SizedBox(width: 4.w),
+                                                          Text(
+                                                            checkOutStr,
+                                                            style:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .textTheme
+                                                                    .bodySmall,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                // Hours chip
+                                                Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 8.w,
+                                                    vertical: 4.h,
+                                                  ),
+                                                  decoration: BoxDecoration(
                                                     color: isEqual
                                                         ? Theme.of(context)
                                                               .colorScheme
                                                               .onTertiary
+                                                              .withValues(
+                                                                alpha: 0.1,
+                                                              )
                                                         : isGreater
                                                         ? Colors.green
-                                                        : Colors.red,
-                                                    fontWeight: FontWeight.w700,
+                                                              .withValues(
+                                                                alpha: 0.1,
+                                                              )
+                                                        : isDark
+                                                        ? Colors.red.withValues(
+                                                            alpha: 0.1,
+                                                          )
+                                                        : Colors.red.withValues(
+                                                            alpha: 0.1,
+                                                          ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          999,
+                                                        ),
+                                                    border: Border.all(
+                                                      color: isEqual
+                                                          ? Theme.of(context)
+                                                                .colorScheme
+                                                                .onTertiary
+                                                                .withValues(
+                                                                  alpha: 0.3,
+                                                                )
+                                                          : isGreater
+                                                          ? Colors.green
+                                                                .withValues(
+                                                                  alpha: 0.3,
+                                                                )
+                                                          : Colors.red
+                                                                .withValues(
+                                                                  alpha: 0.3,
+                                                                ),
+                                                    ),
                                                   ),
+                                                  child: Text(
+                                                    '${(item.workedHrs)!.toStringAsFixed(1)} ${localLang.hoursAbbreviation}',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall
+                                                        ?.copyWith(
+                                                          color: isEqual
+                                                              ? Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .onTertiary
+                                                              : isGreater
+                                                              ? Colors.green
+                                                              : isDark
+                                                              ? const Color.fromARGB(
+                                                                  255,
+                                                                  74,
+                                                                  20,
+                                                                  17,
+                                                                )
+                                                              : Colors.red,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                        ],
+                                          );
+                                        },
                                       ),
-                                    );
-                                  },
+                                    ],
+                                  ),
                                 ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+                error: (error, stackTrace) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error_outline, size: 48.sp, color: Colors.red),
+                      SizedBox(height: 16.h),
+                      Text(
+                        localLang.errorLoadingAttendance,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        localLang.pleaseTryAgainLater,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            );
-          },
-          error: (error, stackTrace) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.error_outline, size: 48.sp, color: Colors.red),
-                SizedBox(height: 16.h),
-                Text(
-                  'Error Loading Attendance',
-                  style: Theme.of(context).textTheme.titleMedium,
+                loading: () => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircularProgressIndicator(),
+                      SizedBox(height: 16.h),
+                      Text(
+                        localLang.loadingAttendance,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
                 ),
-                SizedBox(height: 8.h),
-                Text(
-                  'Please try again later',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
+              ),
             ),
-          ),
-          loading: () => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(),
-                SizedBox(height: 16.h),
-                Text(
-                  'Loading Attendance...',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 

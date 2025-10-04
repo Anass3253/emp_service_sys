@@ -3,6 +3,7 @@ import 'package:employee_service_system/app/providers/employeeProviders/employee
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/expenses_provider.dart';
 import 'package:employee_service_system/app/providers/startDataProviders/expenses_categories_providers.dart';
 import 'package:employee_service_system/app/services/pref_service.dart';
+import 'package:employee_service_system/generated/l10n.dart';
 import 'package:employee_service_system/presentation/resources/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,6 +83,7 @@ class _CreateExpenseSheetState extends ConsumerState<CreateExpenseSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final localLang = S.of(context);
     final categories = ref.watch(expensesCategoriesProvider);
     final df = DateFormat('yyyy-MM-dd');
     return DraggableScrollableSheet(
@@ -104,151 +106,172 @@ class _CreateExpenseSheetState extends ConsumerState<CreateExpenseSheet> {
               child: Column(
                 children: [
                   Text(
-                    'New Expense Request',
+                    localLang.newExpenseRequest,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   SizedBox(height: 8.h),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Column(
-                      children: [
-                        DropdownButtonFormField<Categories>(
-                          initialValue: _selectedCategory,
-                          decoration: const InputDecoration(
-                            labelText: 'Category',
-                          ),
-                          items: categories
-                              .map(
-                                (c) => DropdownMenuItem<Categories>(
-                                  value: c,
-                                  child: Text(c.name),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) => setState(() {
-                            _selectedCategory = value;
-                          }),
-                          validator: (value) =>
-                              value == null ? 'Please select a category' : null,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DropdownButtonFormField<Categories>(
+                        initialValue: _selectedCategory,
+                        decoration: InputDecoration(
+                          labelText: localLang.category,
                         ),
-                        SizedBox(height: 12.h),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: _amountController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Amount',
+                        isExpanded: true,
+                        items: categories
+                            .map(
+                              (c) => DropdownMenuItem<Categories>(
+                                value: c,
+                                child: Text(
+                                  c.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                      decimal: true,
-                                    ),
-                                textInputAction: TextInputAction.next,
-                                validator: (value) {
-                                  if (value == null || value.trim().isEmpty) {
-                                    return 'Amount is required';
-                                  }
-                                  final parsed = double.tryParse(value);
-                                  if (parsed == null || parsed <= 0) {
-                                    return 'Enter a valid amount';
-                                  }
-                                  return null;
-                                },
                               ),
+                            )
+                            .toList(),
+                        selectedItemBuilder: (context) => categories
+                            .map(
+                              (c) => Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  c.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) => setState(() {
+                          _selectedCategory = value;
+                        }),
+                        validator: (value) =>
+                            value == null ? localLang.categoryRequired : null,
+                      ),
+                      SizedBox(height: 12.h),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _amountController,
+                              decoration: InputDecoration(
+                                labelText: localLang.amount,
+                              ),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                              textInputAction: TextInputAction.next,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return localLang.amountRequired;
+                                }
+                                final parsed = double.tryParse(value);
+                                if (parsed == null || parsed <= 0) {
+                                  return localLang.amountInvalid;
+                                }
+                                return null;
+                              },
                             ),
-                            SizedBox(width: 10.w),
-                            Expanded(
-                              child: DropdownButtonFormField<String>(
-                                initialValue: _selectedCurrency,
-                                decoration: const InputDecoration(
-                                  labelText: 'Currency',
-                                ),
-                                items: _currencies
-                                    .map(
-                                      (c) => DropdownMenuItem<String>(
-                                        value: c,
-                                        child: Text(c),
-                                      ),
-                                    )
-                                    .toList(),
-                                onChanged: (value) => setState(() {
-                                  _selectedCurrency = value;
-                                }),
-                                validator: (value) => value == null
-                                    ? 'Please select a currency'
-                                    : null,
+                          ),
+                          SizedBox(width: 10.w),
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              initialValue: _selectedCurrency,
+                              decoration: InputDecoration(
+                                labelText: localLang.currency,
                               ),
+                              items: _currencies
+                                  .map(
+                                    (c) => DropdownMenuItem<String>(
+                                      value: c,
+                                      child: Text(c),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (value) => setState(() {
+                                _selectedCurrency = value;
+                              }),
+                              validator: (value) => value == null
+                                  ? localLang.currencyRequired
+                                  : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12.h),
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                            initialDate: date ?? DateTime.now(),
+                          );
+                          if (picked != null) setState(() => date = picked);
+                        },
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: localLang.date,
+                          ),
+                          child: Text(
+                            date == null
+                                ? localLang.selectDate
+                                : df.format(date!),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
+                      TextFormField(
+                        controller: _descriptionController,
+                        decoration: InputDecoration(
+                          focusColor: Theme.of(context).colorScheme.onPrimary,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          labelStyle: Theme.of(
+                            context,
+                          ).textTheme.bodyLarge!.copyWith(),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          labelText: localLang.description,
+                          alignLabelWithHint: true,
+                        ),
+                        minLines: 1,
+                        maxLines: null,
+                        textInputAction: TextInputAction.next,
+                        validator: (value) =>
+                            (value == null || value.trim().isEmpty)
+                            ? localLang.descriptionRequired
+                            : null,
+                      ),
+                      SizedBox(height: 20.h),
+                      AppButton(
+                        onPressed: _submit,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.send, color: Colors.white),
+                            SizedBox(width: 10.w),
+                            Text(
+                              localLang.submit,
+                              style: Theme.of(context).textTheme.bodyMedium!
+                                  .copyWith(color: Colors.white),
                             ),
                           ],
                         ),
-                        SizedBox(height: 12.h),
-                        InkWell(
-                          onTap: () async {
-                            final picked = await showDatePicker(
-                              context: context,
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(2100),
-                              initialDate: date ?? DateTime.now(),
-                            );
-                            if (picked != null) setState(() => date = picked);
-                          },
-                          child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'Date',
-                            ),
-                            child: Text(
-                              date == null ? 'Select date' : df.format(date!),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20.h),
-                        TextFormField(
-                          controller: _descriptionController,
-                          decoration: InputDecoration(
-                            focusColor: Theme.of(context).colorScheme.onPrimary,
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                              ),
-                              borderRadius: BorderRadius.circular(20.r),
-                            ),
-                            labelStyle: Theme.of(
-                              context,
-                            ).textTheme.bodyLarge!.copyWith(),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20.r),
-                            ),
-                            labelText: 'Description',
-                            alignLabelWithHint: true,
-                          ),
-                          minLines: 1,
-                          maxLines: null,
-                          textInputAction: TextInputAction.next,
-                          validator: (value) =>
-                              (value == null || value.trim().isEmpty)
-                              ? 'Description is required'
-                              : null,
-                        ),
-                        SizedBox(height: 20.h),
-                        AppButton(
-                          onPressed: _submit,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.send),
-                              SizedBox(width: 10.w),
-                              const Text('Submit'),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: MediaQuery.of(context).viewInsets.bottom,
-                        ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).viewInsets.bottom,
+                      ),
+                    ],
                   ),
                 ],
               ),

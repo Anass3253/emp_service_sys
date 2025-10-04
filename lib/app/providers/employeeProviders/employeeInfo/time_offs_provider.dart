@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 class TimeOffsProvider extends StateNotifier<AsyncValue<List<TimeOff>>> {
   TimeOffsProvider() : super(const AsyncLoading());
   final baseUri = 'https://knowledgebi.odoo.com/';
+  // final baseUri = 'https://knowledgebi-staging-22637664.dev.odoo.com/';
 
   Future<void> getTimeOffs(Employee currentEmp, String token) async {
     final timeOffsUri = "${baseUri}knowledgebi-staging/api/employee/timeoff";
@@ -45,33 +46,28 @@ class TimeOffsProvider extends StateNotifier<AsyncValue<List<TimeOff>>> {
         "${baseUri}knowledgebi-staging/api/employee/timeoff/create";
 
     final jsonTimeOff = newTimeOff.toJson();
-    print(jsonTimeOff);
-    try {
-      final response = await http.post(
-        headers: {'Content-Type': 'application/json'},
-        Uri.parse(postTimeOffUri),
-        body: json.encode({
-          "employee_code": currentEmp.empId,
-          "token": token,
-          "leave_type_name": jsonTimeOff['type'],
-          "date_from": jsonTimeOff['date_from'],
-          "date_to": jsonTimeOff['date_to'],
-          "description": jsonTimeOff['description'],
-        }),
-      );
-      print('request sent!!!!!!!!!!');
-      print(response.statusCode);
-      final responseData = json.decode(response.body);
-      print(responseData);
-      if (response.statusCode == 201) {
-        return true;
-      } else {
-        throw Exception(
-          "error creating Request with ${responseData['message']}",
-        );
-      }
-    } catch (e) {
-      throw Exception('Failed to Add Data');
+
+    final response = await http.post(
+      headers: {'Content-Type': 'application/json'},
+      Uri.parse(postTimeOffUri),
+      body: json.encode({
+        "employee_code": currentEmp.empId,
+        "token": token,
+        "leave_type_name": jsonTimeOff['type'],
+        "date_from": jsonTimeOff['date_from'],
+        "date_to": jsonTimeOff['date_to'],
+        "description": jsonTimeOff['description'],
+      }),
+    );
+    print(response.statusCode);
+    final responseData = json.decode(response.body);
+    print(responseData);
+    if (response.statusCode == 201) {
+      return true;
+    } else if (response.statusCode == 409) {
+      throw Exception('You already have a time off request in this period');
+    } else {
+      throw Exception("error creating Request with ${responseData['message']}");
     }
   }
 }

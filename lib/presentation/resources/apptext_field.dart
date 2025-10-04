@@ -43,7 +43,7 @@ class ApptextField extends StatelessWidget {
         suffixIcon: isObscureText
             ? IconButton(
                 icon: Icon(
-                  isObscureText
+                  obscureText
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
                 ),

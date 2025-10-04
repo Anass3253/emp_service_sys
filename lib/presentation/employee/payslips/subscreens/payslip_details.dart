@@ -1,6 +1,7 @@
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/employee_info_provider.dart';
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/payslips_provider.dart';
 import 'package:employee_service_system/app/services/pref_service.dart';
+import 'package:employee_service_system/generated/l10n.dart';
 import 'package:employee_service_system/routing/route_observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,7 +21,7 @@ class _PayslipDetailsState extends ConsumerState<PayslipDetails>
     Future.microtask(() async {
       final currentToken = await PrefService.getToken();
       if (currentToken != null) {
-        final currentEmp =  ref.read(empInfoProvider).value;
+        final currentEmp = ref.read(empInfoProvider).value;
         final currentPayslip = ref.read(payslipsProvider).value![widget.index];
         if (currentEmp != null) {
           return ref
@@ -49,7 +50,7 @@ class _PayslipDetailsState extends ConsumerState<PayslipDetails>
     Future.microtask(() async {
       final currentToken = await PrefService.getToken();
       if (currentToken != null) {
-        final currentEmp =  ref.read(empInfoProvider).value;
+        final currentEmp = ref.read(empInfoProvider).value;
         final currentPayslip = ref.read(payslipsProvider).value![widget.index];
 
         if (currentEmp != null) {
@@ -63,10 +64,11 @@ class _PayslipDetailsState extends ConsumerState<PayslipDetails>
 
   @override
   Widget build(BuildContext context) {
+    final localeLang = S.of(context);
     final payslipsAsync = ref.watch(payslipsProvider);
     final currentEmp = ref.watch(empInfoProvider).value;
     return Scaffold(
-      appBar: AppBar(title: const Text('Payslip Details'),),
+      appBar: AppBar(title: Text(localeLang.payslipDetails)),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.h),
         child: payslipsAsync.when(
@@ -86,7 +88,7 @@ class _PayslipDetailsState extends ConsumerState<PayslipDetails>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Employee',
+                          localeLang.employeeSection,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(
                                 fontWeight: FontWeight.bold,
@@ -94,18 +96,34 @@ class _PayslipDetailsState extends ConsumerState<PayslipDetails>
                               ),
                         ),
                         SizedBox(height: 5.h),
-                        _buildInfoRow(context, 'Name', currentEmp!.name),
-                        _buildInfoRow(context, 'Marital', currentEmp.marital),
-                        _buildInfoRow(context, 'Job ID', currentEmp.jobId),
-                        _buildInfoRow(context, 'Manager', currentEmp.manager),
                         _buildInfoRow(
                           context,
-                          'Identification',
+                          localeLang.name,
+                          currentEmp!.name,
+                        ),
+                        _buildInfoRow(
+                          context,
+                          localeLang.marital,
+                          currentEmp.marital,
+                        ),
+                        _buildInfoRow(
+                          context,
+                          localeLang.jobId,
+                          currentEmp.jobId,
+                        ),
+                        _buildInfoRow(
+                          context,
+                          localeLang.manager,
+                          currentEmp.manager,
+                        ),
+                        _buildInfoRow(
+                          context,
+                          localeLang.identification,
                           currentEmp.identificationId,
                         ),
                         _buildInfoRow(
                           context,
-                          'Work Email',
+                          localeLang.workEmail,
                           currentEmp.workEmail,
                         ),
                       ],
@@ -124,7 +142,7 @@ class _PayslipDetailsState extends ConsumerState<PayslipDetails>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Payslip',
+                          localeLang.payslipSection,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(
                                 fontWeight: FontWeight.bold,
@@ -141,7 +159,7 @@ class _PayslipDetailsState extends ConsumerState<PayslipDetails>
                           ...payslips.lines!.map(
                             (l) => _buildInfoRow(
                               context,
-                              l.name,
+                              _localizeLines(l.name, context),
                               l.total.toStringAsFixed(2),
                             ),
                           ),
@@ -154,21 +172,25 @@ class _PayslipDetailsState extends ConsumerState<PayslipDetails>
                           ...payslips.workedDays!.map(
                             (w) => Column(
                               children: [
-                                _buildInfoRow(context, w.name, ''),
+                                _buildInfoRow(
+                                  context,
+                                  _localizeLines(w.name, context),
+                                  '',
+                                ),
                                 SizedBox(height: 4.h),
                                 _buildInfoRow(
                                   context,
-                                  'Hours',
+                                  localeLang.hours,
                                   w.numberOfHours.toStringAsFixed(2),
                                 ),
                                 _buildInfoRow(
                                   context,
-                                  'Days',
+                                  localeLang.days,
                                   w.numberOfDays.toStringAsFixed(2),
                                 ),
                                 _buildInfoRow(
                                   context,
-                                  'Amount',
+                                  localeLang.amount,
                                   w.amount.toStringAsFixed(2),
                                 ),
                               ],
@@ -189,12 +211,12 @@ class _PayslipDetailsState extends ConsumerState<PayslipDetails>
                 Icon(Icons.error_outline, size: 48.sp, color: Colors.red),
                 SizedBox(height: 16.h),
                 Text(
-                  'Error Loading Payslips',
+                  localeLang.errorLoadingPayslips,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'Please try again later',
+                  localeLang.pleaseTryAgainLater,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -207,7 +229,7 @@ class _PayslipDetailsState extends ConsumerState<PayslipDetails>
                 const CircularProgressIndicator(),
                 SizedBox(height: 16.h),
                 Text(
-                  'Loading Payslips...',
+                  localeLang.loadingPayslips,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -230,7 +252,9 @@ Widget _buildInfoRow(BuildContext context, String label, String value) {
           child: Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.7),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -247,4 +271,19 @@ Widget _buildInfoRow(BuildContext context, String label, String value) {
       ],
     ),
   );
+}
+
+String _localizeLines(String label, BuildContext context) {
+  final l = label.toLowerCase();
+
+  if (l == "basic salary") {
+    return S.of(context).basicSalary;
+  } else if (l == "taxable salary") {
+    return S.of(context).texableSalary;
+  } else if (l == "net salary") {
+    return S.of(context).netSalary;
+  } else if (l == "attendance") {
+    return S.of(context).attendance;
+  }
+  return '';
 }

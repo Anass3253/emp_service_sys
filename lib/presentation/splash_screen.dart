@@ -58,9 +58,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final Brightness currentTheme = Theme.of(context).brightness;
+    final bool isDark = currentTheme == Brightness.dark;
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Center(child: Image.asset("assets/images/splash.gif")),
+      body: Center(
+        child: Image.asset(
+          isDark
+              ? "assets/images/blue logo animate.gif"
+              : "assets/images/logo animate.gif",
+        ),
+      ),
     );
   }
 }

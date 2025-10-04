@@ -6,11 +6,17 @@ class DashboardCard extends StatelessWidget {
     super.key,
     required this.icon,
     required this.title,
+    required this.description,
+    required this.clickToView,
     required this.route,
+    this.imageIcon,
   });
   final String route;
-  final IconData icon;
+  final IconData? icon;
+  final Widget? imageIcon;
   final String title;
+  final String description;
+  final String clickToView;
 
   @override
   Widget build(BuildContext context) {
@@ -25,57 +31,74 @@ class DashboardCard extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.all(10.w),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
+                  width: 45,
+                  height: 45,
                   decoration: BoxDecoration(
+                    
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(15.r),
-                    color: Theme.of(context).colorScheme.tertiary,
+                    color: Colors.transparent,
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.tertiary,
+                    ),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Icon(icon, color: Colors.white),
+                    child:
+                        imageIcon ?? Icon(
+                          icon,
+                          color: Theme.of(context).colorScheme.tertiary,
+                        ),
                   ),
                 ),
                 SizedBox(width: 5.w),
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.tertiary,
+                Expanded(
+                  child: Text(
+                    maxLines: null,
+                    title,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.tertiary,
+                    ),
                   ),
                 ),
               ],
             ),
             SizedBox(height: 10.h),
             Text(
-              'Manage your $title',
+              description,
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
                 color: Colors.grey,
-                fontWeight: FontWeight.bold,
+                // fontWeight: FontWeight.bold,
               ),
             ),
             const Spacer(),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, route);
-              },
-              style: ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(
-                  Theme.of(context).colorScheme.tertiary,
-                ),
-                shape: WidgetStatePropertyAll(
-                  ContinuousRectangleBorder(
-                    borderRadius: BorderRadiusGeometry.circular(20.r),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, route);
+                },
+                style: ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(
+                    Theme.of(context).colorScheme.tertiary,
+                  ),
+                  shape: WidgetStatePropertyAll(
+                    ContinuousRectangleBorder(
+                      borderRadius: BorderRadiusGeometry.circular(20.r),
+                    ),
                   ),
                 ),
-              ),
-              child: Text(
-                "View $title",
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall!.copyWith(color: Colors.white),
+                child: Text(
+                  clickToView,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall!.copyWith(color: Colors.white),
+                ),
               ),
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:employee_service_system/app/models/usersModels/employee.dart';
+import 'package:employee_service_system/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -12,18 +13,19 @@ class PrivInfoScreen extends StatefulWidget {
 class _PrivInfoScreenState extends State<PrivInfoScreen> {
   @override
   Widget build(BuildContext context) {
+    final localeLang = S.of(context);
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 20.h),
           Text(
-            'PRIVATE CONTACT',
+            localeLang.privateContact,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           //---------------------------------------
           SizedBox(height: 15.h),
-          Text('Address', style: Theme.of(context).textTheme.bodyLarge),
+          Text(localeLang.address, style: Theme.of(context).textTheme.bodyLarge),
           SizedBox(height: 5.h),
           Text(
             widget.user.addressId,
@@ -33,7 +35,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           ),
           //-----------------------------------------------         
           SizedBox(height: 15.h),
-          Text('Language', style: Theme.of(context).textTheme.bodyLarge),
+          Text(localeLang.language, style: Theme.of(context).textTheme.bodyLarge),
           SizedBox(height: 5.h),
           Text(
             'Dummy...',
@@ -44,7 +46,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'Home-Work Distance',
+            localeLang.homeWorkDistance,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           SizedBox(height: 5.h),
@@ -58,10 +60,10 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           SizedBox(height: 20.h),
           const Divider(),
           SizedBox(height: 20.h),
-          Text('JOB POSITION', style: Theme.of(context).textTheme.titleLarge),
+          Text(localeLang.jobPosition, style: Theme.of(context).textTheme.titleLarge),
           SizedBox(height: 15.h),
           Text(
-            'Certificate Level',
+            localeLang.certificateLevel,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -75,7 +77,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //-----------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'Field of Study',
+            localeLang.fieldOfStudy,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -90,7 +92,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //---------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'School',
+            localeLang.school,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -106,10 +108,10 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           SizedBox(height: 20.h),
           const Divider(),
           SizedBox(height: 20.h),
-          Text('WORK PERMIT', style: Theme.of(context).textTheme.titleLarge),
+          Text(localeLang.workPermit, style: Theme.of(context).textTheme.titleLarge),
           SizedBox(height: 15.h),
           Text(
-            'Visa No',
+            localeLang.visaNo,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -123,7 +125,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //-----------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'Work Permit No',
+            localeLang.workPermitNo,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -137,7 +139,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //-------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'Visa Expire Date',
+            localeLang.visaExpireDate,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -151,7 +153,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //--------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'Work Permit Expiration Date',
+            localeLang.workPermitExpirationDate,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -166,11 +168,11 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           SizedBox(height: 20.h),
           const Divider(),
           SizedBox(height: 20.h),
-          Text('FAMILY STATUS', style: Theme.of(context).textTheme.titleLarge),
+          Text(localeLang.familyStatus, style: Theme.of(context).textTheme.titleLarge),
           SizedBox(height: 15.h),
           SizedBox(height: 15.h),
           Text(
-            'Marital Status',
+            localeLang.maritalStatus,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -184,7 +186,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //---------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'Number of Dependent Children',
+            localeLang.dependentChildren,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -199,11 +201,11 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           SizedBox(height: 20.h),
           const Divider(),
           SizedBox(height: 20.h),
-          Text('EMERGENCY', style: Theme.of(context).textTheme.titleLarge),
+          Text(localeLang.emergency, style: Theme.of(context).textTheme.titleLarge),
           SizedBox(height: 15.h),
           SizedBox(height: 15.h),
           Text(
-            'Contact Name',
+            localeLang.contactName,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -217,7 +219,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //---------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'Contact Phone',
+            localeLang.contactPhone,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -232,11 +234,11 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           SizedBox(height: 20.h),
           const Divider(),
           SizedBox(height: 20.h),
-          Text('CITIZENSHIP', style: Theme.of(context).textTheme.titleLarge),
+          Text(localeLang.citizenship, style: Theme.of(context).textTheme.titleLarge),
           SizedBox(height: 15.h),
           SizedBox(height: 15.h),
           Text(
-            'Nationality(Country)',
+            localeLang.nationality,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -250,7 +252,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //---------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'Identification No',
+            localeLang.identificationNo,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -264,7 +266,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //----------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'Passport No',
+            localeLang.passportNo,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -278,7 +280,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //----------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'Gender',
+            localeLang.gender,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -292,7 +294,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //-------------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'Date of Birth',
+            localeLang.dateOfBirth,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -306,7 +308,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //--------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'Place of Birth',
+            localeLang.placeOfBirth,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,
@@ -320,7 +322,7 @@ class _PrivInfoScreenState extends State<PrivInfoScreen> {
           //---------------------------------------------------------
           SizedBox(height: 15.h),
           Text(
-            'Country of Birth',
+            localeLang.countryOfBirth,
             style: Theme.of(
               context,
             ).textTheme.bodyLarge,

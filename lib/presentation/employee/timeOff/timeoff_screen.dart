@@ -1,6 +1,8 @@
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/employee_info_provider.dart';
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/time_offs_provider.dart';
+import 'package:employee_service_system/app/providers/startDataProviders/timeoff_types_provider.dart';
 import 'package:employee_service_system/app/services/pref_service.dart';
+import 'package:employee_service_system/generated/l10n.dart';
 import 'package:employee_service_system/presentation/employee/timeOff/widget/create_time_off_sheet.dart';
 import 'package:employee_service_system/presentation/employee/timeOff/widget/time_off_card.dart';
 import 'package:employee_service_system/routing/route_observer.dart';
@@ -21,6 +23,7 @@ class _TimeoffScreenState extends ConsumerState<TimeoffScreen> with RouteAware {
     Future.microtask(() async {
       final currentToken = await PrefService.getToken();
       if (currentToken != null) {
+        ref.read(timeoffTypesProvider.notifier).getTimeoffsTypes(currentToken);
         final currentEmp = ref.read(empInfoProvider).value;
         if (currentEmp != null) {
           return ref
@@ -61,6 +64,7 @@ class _TimeoffScreenState extends ConsumerState<TimeoffScreen> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
+    final localLang = S.of(context);
     final timeOffsAsync = ref.watch(timeOffProvider);
     Future<void> refresh() async {
       final currentToken = await PrefService.getToken();
@@ -75,28 +79,37 @@ class _TimeoffScreenState extends ConsumerState<TimeoffScreen> with RouteAware {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Time Offs')),
+      appBar: AppBar(title: Text(localLang.timeOffTitle)),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Theme.of(context).colorScheme.secondary,
         onPressed: _openCreateSheet,
-        icon: const Icon(Icons.add),
-        label: const Text('Request Time Off'),
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: Text(
+          localLang.requestTimeOff,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium!.copyWith(color: Colors.white),
+        ),
       ),
+      // backgroundColor: Theme.of(context).colorScheme.surface,
       body: Padding(
         padding: EdgeInsets.all(10.h),
         child: timeOffsAsync.when(
           data: (timeOffs) {
             if (timeOffs.isEmpty) {
               return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'You currently don\'t have any time off records',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        localLang.noTimeOffRecords,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
@@ -129,19 +142,19 @@ class _TimeoffScreenState extends ConsumerState<TimeoffScreen> with RouteAware {
                       // ),
                       _buildStatChip(
                         context,
-                        'Approved',
+                        localLang.approved,
                         totals.approved,
                         Colors.green,
                       ),
                       _buildStatChip(
                         context,
-                        'Pending',
+                        localLang.pending,
                         totals.pending,
                         Colors.orange,
                       ),
                       _buildStatChip(
                         context,
-                        'Refused',
+                        localLang.refused,
                         totals.refused,
                         Colors.red,
                       ),
@@ -175,7 +188,19 @@ class _TimeoffScreenState extends ConsumerState<TimeoffScreen> with RouteAware {
               ],
             ),
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(),
+                SizedBox(height: 16.h),
+                Text(
+                  localLang.loadingTimeoff,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -277,16 +302,16 @@ class _BalanceHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Available Hours',
+                  S.of(context).availableHours,
                   style: Theme.of(
                     context,
-                  ).textTheme.bodyLarge?.copyWith(color: Colors.black),
+                  ).textTheme.bodyLarge?.copyWith(color: Colors.white),
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   availableHours?.toString() ?? '-',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Colors.black,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -299,16 +324,16 @@ class _BalanceHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  'Requested Hours',
+                  S.of(context).requestedHours,
                   style: Theme.of(
                     context,
-                  ).textTheme.bodyLarge?.copyWith(color: Colors.black),
+                  ).textTheme.bodyLarge?.copyWith(color: Colors.white),
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   requestedHours.toString(),
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Colors.black,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

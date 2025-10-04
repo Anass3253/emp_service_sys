@@ -49,6 +49,16 @@ class PrefService {
     await prefs.setString('check_in', checkIn);
   }
 
+  static Future<void> saveCheckInState(bool isCheckin) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_checkIn', isCheckin);
+  }
+
+  static Future<bool?> getCheckInState() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('is_checkIn',)?? false;
+  }
+
   static Future<String?> getCheckIn() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('check_in');

@@ -1,6 +1,10 @@
+import 'package:employee_service_system/app/providers/ui_providers/language_provider.dart';
 import 'package:employee_service_system/app/services/pref_service.dart';
+import 'package:employee_service_system/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:employee_service_system/routing/routes.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 class MyProfile extends StatefulWidget {
   const MyProfile({super.key});
@@ -12,18 +16,15 @@ class MyProfile extends StatefulWidget {
 class _MyProfileState extends State<MyProfile> {
   @override
   Widget build(BuildContext context) {
+    final localeLang = S.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              backgroundImage: AssetImage('assets/images/KBI_logo2.png'),
-              radius: 25,
-              backgroundColor: Colors.transparent,
-            ),
-            Text('Knowledge BI'),
-          ],
+        title: Center(
+          child: Image.asset(
+            'assets/images/knowledge Bi.png',
+            height: 65.h,
+            fit: BoxFit.contain,
+          ),
         ),
       ),
       body: Column(
@@ -33,9 +34,22 @@ class _MyProfileState extends State<MyProfile> {
             onTap: () {
               Navigator.pushNamed(context, Routes.aboutMeScreen);
             },
-            child: const ListTile(
-              title: Text('About me'),
-              trailing: Icon(Icons.person_2_outlined),
+            child: ListTile(
+              title: Text(localeLang.aboutMe),
+              trailing: const Icon(Icons.person_2_outlined),
+            ),
+          ),
+          const Divider(color: Colors.grey),
+          GestureDetector(
+            onTap: () {
+              Provider.of<LanguageProvider>(
+                context,
+                listen: false,
+              ).toggleLanguage();
+            },
+            child: ListTile(
+              title: Text(localeLang.changeLanguage),
+              trailing: const Icon(Icons.language_outlined, color: Colors.black),
             ),
           ),
           const Divider(color: Colors.grey),
@@ -47,9 +61,9 @@ class _MyProfileState extends State<MyProfile> {
                 Navigator.pushReplacementNamed(context, Routes.signin);
               }
             },
-            child: const ListTile(
-              title: Text('Log out'),
-              trailing: Icon(Icons.logout_outlined, color: Colors.red),
+            child: ListTile(
+              title: Text(localeLang.logOut),
+              trailing: const Icon(Icons.logout_outlined, color: Colors.red),
             ),
           ),
           const Divider(color: Colors.grey),

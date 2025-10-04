@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 class ExpensesProvider extends StateNotifier<AsyncValue<List<Expenses>>> {
   ExpensesProvider() : super(const AsyncLoading());
   final baseUri = 'https://knowledgebi.odoo.com/';
+  // final baseUri = 'https://knowledgebi-staging-22637664.dev.odoo.com/';
   Future<void> getExpenses(String token, Employee currentEmp) async {
     final expensesUri = "${baseUri}knowledgebi-staging/api/employee/expense";
     try {

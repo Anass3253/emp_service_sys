@@ -1,5 +1,5 @@
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/employee_info_provider.dart';
-import 'package:employee_service_system/presentation/resources/theme_manager.dart';
+import 'package:employee_service_system/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,13 +16,14 @@ class AboutMeScreen extends ConsumerStatefulWidget {
 class _AboutMeScreenState extends ConsumerState<AboutMeScreen> {
   @override
   Widget build(BuildContext context) {
+    final localeLang = S.of(context);
     final currentEmp = ref.read(empInfoProvider).value;
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(title: const Text('My Profile')),
+        appBar: AppBar(title: Text(localeLang.profile)),
         body: Padding(
-          padding: EdgeInsets.all(10.w),
+          padding: EdgeInsets.all(30.w),
           child: Column(
             children: [
               TabBar(
@@ -36,13 +37,11 @@ class _AboutMeScreenState extends ConsumerState<AboutMeScreen> {
                 indicator: BoxDecoration(
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(20.r),
-                  gradient: Theme.of(
-                    context,
-                  ).extension<BackgroundTheme>()!.scaffoldGradient,
+                  color: Theme.of(context).colorScheme.secondary
                 ),
-                tabs: const [
-                  Tab(child: Text('Overview')),
-                  Tab(child: Text('Private Information')),
+                tabs:  [
+                  Tab(child: Text(localeLang.overviewTitle)),
+                  Tab(child: Text(localeLang.privateInformation)),
                 ],
               ),
               Expanded(

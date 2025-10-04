@@ -1,6 +1,7 @@
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/employee_info_provider.dart';
 import 'package:employee_service_system/app/providers/employeeProviders/employeeInfo/payslips_provider.dart';
 import 'package:employee_service_system/app/services/pref_service.dart';
+import 'package:employee_service_system/generated/l10n.dart';
 import 'package:employee_service_system/routing/route_observer.dart';
 import 'package:employee_service_system/routing/routes.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +63,13 @@ class _PayslipsScreenState extends ConsumerState<PayslipsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final localLang = S.of(context);
     final payslipsAsync = ref.watch(payslipsProvider);
+
+    Locale currentLocale = Localizations.localeOf(context);
+    String languageCode = currentLocale.languageCode; //current locale
+    bool isArabic = languageCode == 'ar';
+
     Future<void> refresh() async {
       final currentToken = await PrefService.getToken();
       if (currentToken != null) {
@@ -77,7 +84,7 @@ class _PayslipsScreenState extends ConsumerState<PayslipsScreen>
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(title: const Text('Payslips'),),
+      appBar: AppBar(title: Text(localLang.payslipsTitle)),
       body: Padding(
         padding: EdgeInsets.all(10.w),
         child: payslipsAsync.when(
@@ -88,15 +95,15 @@ class _PayslipsScreenState extends ConsumerState<PayslipsScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'You currently don\'t have any Payslips!',
+                          localLang.noPayslipsRecords,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ],
                     ),
                   )
                 : RefreshIndicator(
-                  onRefresh: refresh,
-                  child: ListView.builder(
+                    onRefresh: refresh,
+                    child: ListView.builder(
                       itemCount: payslipses.length,
                       itemBuilder: (context, index) {
                         final payslip = payslipses[index];
@@ -134,7 +141,7 @@ class _PayslipsScreenState extends ConsumerState<PayslipsScreen>
                                           ),
                                           SizedBox(height: 4.h),
                                           Text(
-                                            'Ref: ${payslip.reference}',
+                                            '${localLang.ref}: ${payslip.reference}',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodySmall
@@ -157,7 +164,9 @@ class _PayslipsScreenState extends ConsumerState<PayslipsScreen>
                                         color: _getStateColor(
                                           payslip.state,
                                         ).withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(8.r),
+                                        borderRadius: BorderRadius.circular(
+                                          8.r,
+                                        ),
                                       ),
                                       child: Text(
                                         payslip.state.toUpperCase(),
@@ -175,36 +184,64 @@ class _PayslipsScreenState extends ConsumerState<PayslipsScreen>
                                   ],
                                 ),
                                 SizedBox(height: 12.h),
-                  
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _buildDateCard(
-                                        context,
-                                        'From',
-                                        DateFormat(
-                                          'MMM dd, yyyy',
-                                        ).format(payslip.dateFrom),
-                                        Icons.calendar_today,
-                                        Colors.blue,
+
+                                isArabic
+                                    ? Row(
+                                        children: [
+                                          Expanded(
+                                            child: _buildDateCard(
+                                              context,
+                                              localLang.to,
+                                              DateFormat(
+                                                'MMM dd, yyyy',
+                                              ).format(payslip.dateTo),
+                                              Icons.event,
+                                              Colors.purple,
+                                            ),
+                                          ),
+                                          SizedBox(width: 12.w),
+                                          Expanded(
+                                            child: _buildDateCard(
+                                              context,
+                                              localLang.from,
+                                              DateFormat(
+                                                'MMM dd, yyyy',
+                                              ).format(payslip.dateFrom),
+                                              Icons.calendar_today,
+                                              Colors.blue,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Row(
+                                        children: [
+                                          Expanded(
+                                            child: _buildDateCard(
+                                              context,
+                                              localLang.from,
+                                              DateFormat(
+                                                'MMM dd, yyyy',
+                                              ).format(payslip.dateFrom),
+                                              Icons.calendar_today,
+                                              Colors.blue,
+                                            ),
+                                          ),
+                                          SizedBox(width: 12.w),
+                                          Expanded(
+                                            child: _buildDateCard(
+                                              context,
+                                              localLang.to,
+                                              DateFormat(
+                                                'MMM dd, yyyy',
+                                              ).format(payslip.dateTo),
+                                              Icons.event,
+                                              Colors.purple,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    SizedBox(width: 12.w),
-                                    Expanded(
-                                      child: _buildDateCard(
-                                        context,
-                                        'To',
-                                        DateFormat(
-                                          'MMM dd, yyyy',
-                                        ).format(payslip.dateTo),
-                                        Icons.event,
-                                        Colors.purple,
-                                      ),
-                                    ),
-                                  ],
-                                ),
                                 SizedBox(height: 12.h),
-                  
+
                                 Center(
                                   child: ElevatedButton.icon(
                                     onPressed: () {
@@ -215,14 +252,16 @@ class _PayslipsScreenState extends ConsumerState<PayslipsScreen>
                                       );
                                     },
                                     icon: Icon(Icons.visibility, size: 18.sp),
-                                    label: const Text('View Payslip'),
+                                    label: Text(localLang.viewPayslip),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Theme.of(
                                         context,
                                       ).colorScheme.primary,
                                       foregroundColor: Colors.white,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8.r),
+                                        borderRadius: BorderRadius.circular(
+                                          8.r,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -233,7 +272,7 @@ class _PayslipsScreenState extends ConsumerState<PayslipsScreen>
                         );
                       },
                     ),
-                );
+                  );
           },
           error: (error, stackTrace) => Center(
             child: Column(
@@ -242,12 +281,12 @@ class _PayslipsScreenState extends ConsumerState<PayslipsScreen>
                 Icon(Icons.error_outline, size: 48.sp, color: Colors.red),
                 SizedBox(height: 16.h),
                 Text(
-                  'Error Loading Payslips',
+                  localLang.errorLoadingPayslips,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'Please try again later',
+                  localLang.pleaseTryAgainLater,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -260,7 +299,7 @@ class _PayslipsScreenState extends ConsumerState<PayslipsScreen>
                 const CircularProgressIndicator(),
                 SizedBox(height: 16.h),
                 Text(
-                  'Loading Payslips...',
+                  localLang.loadingPayslips,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],

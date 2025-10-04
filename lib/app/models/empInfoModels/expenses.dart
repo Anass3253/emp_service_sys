@@ -36,7 +36,7 @@ class Expenses {
       "category_name": category,
       "amount": amount,
       "currency": currency,
-      "date": DateFormat("yyyy-MM-dd").format(date).toString(),
+      "date": DateFormat("yyyy-MM-dd", 'en').format(date).toString(),
       "description": description,
     };
   }

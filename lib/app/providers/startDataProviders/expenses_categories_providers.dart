@@ -9,6 +9,7 @@ class ExpensesCategoriesProviders extends StateNotifier<List<Categories>> {
 
   Future<void> getExpensesCategories(String token) async {
     const baseUri = 'https://knowledgebi.odoo.com/';
+    // const baseUri = 'https://knowledgebi-staging-22637664.dev.odoo.com/';
     const categoriesUri = "${baseUri}knowledgebi-staging/api/expense/categories";
     try {
       final categResponse = await http.post(
